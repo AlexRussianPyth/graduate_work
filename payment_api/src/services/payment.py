@@ -9,9 +9,7 @@ from sqlalchemy.future import select
 
 from api.v1 import schemas
 from db.postgres import get_db
-from ecom.abstract import EcomClient
-# TODO сделать получение клиента из абстрактного класса
-from ecom.stripe_api import get_client
+from ecom.abstract import EcomClient, get_client
 from models import models
 from schema.product import Product
 from services.base import BaseService
@@ -54,8 +52,7 @@ class PaymentService(BaseService):
             select(models.Payment)
             .where(
                 models.Payment.user_id == user_id,
-                # FIXME закомментировал для отладки
-                # models.Payment.is_paid,
+                models.Payment.is_paid,
             )
             .offset(offset * limit)
             .limit(limit)
@@ -68,7 +65,7 @@ class PaymentService(BaseService):
             user_id=user_payment.user_id,
             start_date=user_payment.start_date,
             end_date=user_payment.start_date + relativedelta(months=1, days=-1),
-            subscription=user_payment.subscription.name,
+            subscription=user_payment.subscription,
             client_secret=user_payment.client_secret,
             intent_id=user_payment.intent_id,
         )
